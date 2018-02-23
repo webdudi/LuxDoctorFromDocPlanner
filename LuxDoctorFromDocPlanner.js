@@ -37,16 +37,12 @@ function getSearchParamForDoctor(doctor) {
 
 function createStarScaleAsImgElements(numberOfStars) {
     var text = "";
-    if(numberOfStars == 0){
-        return '_____';
+
+    if(isNaN(numberOfStars) || typeof numberOfStars == 'undefined'){
+        return '';
     }
-    for (var i = 0; i < numberOfStars; i++) {
-        text = text + '*';
-    }
-    for (var j = numberOfStars; j < 5; j++) {
-        text = text + '_';
-    }
-    return text;
+
+    return numberOfStars + '/5';
 }
 
 function addNoDataInfo(doctor) {
@@ -55,16 +51,15 @@ function addNoDataInfo(doctor) {
     for (var i = 0; i < doctorNameDiv.length; i++) {
         if (doctorNameDiv[i].textContent.trim() === doctorName) {
             $(doctorNameDiv[i]).append("&nbsp;&nbsp;");
-            var linkAndStars = '<a href="https://www.znanylekarz.pl/" target="_blank" '
-            + 'title="Brak strony o danym lekarzu w serwisie znanylekarz.pl Kliknij, aby przejść do tej strony '
-            + 'i spróbuj wyszukać lekarza ręcznie."><span style="white-space: nowrap;">'
-            + createStarScaleAsImgElements(0) + '</span></a>';
+            var linkAndStars = '<a href="https://www.google.pl/search?q='+doctorName+'" target="_blank" '
+            + 'title="Brak strony o danym lekarzu w serwisie znanylekarz.pl Kliknij, aby wyszukać informacji w Google">'
+            + '<span style="white-space: nowrap;">brak</span></a>';
             $(doctorNameDiv[i]).append(linkAndStars);
         }
     }
 }
 
-function addStarsToLuxPage(doctor, numberOfStars, url) {
+function addStarsToLuxPage(doctor, numberOfStars,opinionCount, url) {
     var doctorNameDiv = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(1)");
     var doctorName = getDoctorName(doctor);
     for (var i = 0; i < doctorNameDiv.length; i++) {
@@ -73,7 +68,7 @@ function addStarsToLuxPage(doctor, numberOfStars, url) {
             var linkAndStars = '<a href="' + url + '" target="_blank" '
             + 'title="Przejdź do strony znanylekarz.pl, aby zobaczyć wszystkie opinie.">'
             + '<span style="white-space: nowrap;">'
-            + createStarScaleAsImgElements(numberOfStars) + '</span></a>';
+            + createStarScaleAsImgElements(numberOfStars) + '</span>&nbsp;('+opinionCount+')</a>';
             $(doctorNameDiv[i]).append(linkAndStars);
         }
     }
@@ -90,7 +85,8 @@ function loadDoctor(doctor) {
     doctorResponse.done(function (data) {
         if (data.hits.length > 0) {
             var numberOfStars = parseFloat(data.hits[0].stars);
-            addStarsToLuxPage(doctor, numberOfStars, data.hits[0].url.replace("http://", "https://"));
+            var opinionCount = data.hits[0].opinionCount;
+            addStarsToLuxPage(doctor, numberOfStars, opinionCount, data.hits[0].url.replace("http://", "https://"));
         } else {
             addNoDataInfo(doctor);
         }
