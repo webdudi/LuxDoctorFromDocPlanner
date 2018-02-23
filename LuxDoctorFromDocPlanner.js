@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LuxMed - points from DocPlanner
 // @namespace    http://www.webdudi.pl/
-// @version      0.1
+// @version      1.0
 // @description  Get stars from site znanylekarz.pl
 // @author       Piotr Dutko <p.dutko@webdudi.pl>
 // @match        https://portalpacjenta.luxmed.pl/PatientPortal/Reservations/Reservation/Find
