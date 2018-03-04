@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LuxMed - points from DocPlanner
 // @namespace    http://www.webdudi.pl/
-// @version      1.0
+// @version      1.1
 // @description  Get stars from site znanylekarz.pl
 // @author       Piotr Dutko <p.dutko@webdudi.pl>
 // @match        https://portalpacjenta.luxmed.pl/PatientPortal/Reservations/Reservation/Find
@@ -35,14 +35,12 @@ function getSearchParamForDoctor(doctor) {
     return text.replace(/ /g, "%20");
 }
 
-function createStarScaleAsImgElements(numberOfStars) {
-    var text = "";
-
-    if(isNaN(numberOfStars) || typeof numberOfStars == 'undefined'){
+function createPointsElements(numberOfPoints) {
+    if(isNaN(numberOfPoints) || typeof numberOfPoints == 'undefined'){
         return '';
     }
 
-    return numberOfStars + '/5';
+    return numberOfPoints + '/5';
 }
 
 function addNoDataInfo(doctor) {
@@ -51,25 +49,25 @@ function addNoDataInfo(doctor) {
     for (var i = 0; i < doctorNameDiv.length; i++) {
         if (doctorNameDiv[i].textContent.trim() === doctorName) {
             $(doctorNameDiv[i]).append("&nbsp;&nbsp;");
-            var linkAndStars = '<a href="https://www.google.pl/search?q='+doctorName+'" target="_blank" '
+            var text = '<a href="https://www.google.pl/search?q='+doctorName+'" target="_blank" '
             + 'title="Brak strony o danym lekarzu w serwisie znanylekarz.pl Kliknij, aby wyszukać informacji w Google">'
             + '<span style="white-space: nowrap;">brak</span></a>';
-            $(doctorNameDiv[i]).append(linkAndStars);
+            $(doctorNameDiv[i]).append(text);
         }
     }
 }
 
-function addStarsToLuxPage(doctor, numberOfStars,opinionCount, url) {
+function addPointsToPage(doctor, numberOfPoints, opinionCount, url) {
     var doctorNameDiv = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(1)");
     var doctorName = getDoctorName(doctor);
     for (var i = 0; i < doctorNameDiv.length; i++) {
         if (doctorNameDiv[i].textContent.trim() === doctorName) {
             $(doctorNameDiv[i]).append("&nbsp;&nbsp;");
-            var linkAndStars = '<a href="' + url + '" target="_blank" '
+            var text = '<a href="' + url + '" target="_blank" '
             + 'title="Przejdź do strony znanylekarz.pl, aby zobaczyć wszystkie opinie.">'
             + '<span style="white-space: nowrap;">'
-            + createStarScaleAsImgElements(numberOfStars) + '</span>&nbsp;('+opinionCount+')</a>';
-            $(doctorNameDiv[i]).append(linkAndStars);
+            + createPointsElements(numberOfPoints) + '</span>&nbsp;('+opinionCount+')</a>';
+            $(doctorNameDiv[i]).append(text);
         }
     }
 }
@@ -86,14 +84,14 @@ function loadDoctor(doctor) {
         if (data.hits.length > 0) {
             var numberOfStars = parseFloat(data.hits[0].stars);
             var opinionCount = data.hits[0].opinionCount;
-            addStarsToLuxPage(doctor, numberOfStars, opinionCount, data.hits[0].url.replace("http://", "https://"));
+            addPointsToPage(doctor, numberOfStars, opinionCount, data.hits[0].url.replace("http://", "https://"));
         } else {
             addNoDataInfo(doctor);
         }
     });
 }
 
-function loadStars(doctors) {
+function loadPoints(doctors) {
     doctors.forEach(loadDoctor);
 }
 
@@ -155,7 +153,7 @@ serviceLuxToDocPlanner.set("Umówienie wizyty u stomatologa dziecięcego", "stom
         doctors.add(doctor);
     }
 
-    loadStars(doctors);
+    loadPoints(doctors);
 
 
 })();
