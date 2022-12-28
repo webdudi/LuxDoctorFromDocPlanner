@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         LuxMed - points from DocPlanner
 // @namespace    http://www.webdudi.pl/
-// @version      1.1
+// @version      1.2
 // @description  Get stars from site znanylekarz.pl
 // @author       Piotr Dutko <p.dutko@webdudi.pl>
 // @match        https://portalpacjenta.luxmed.pl/PatientPortal/Reservations/Reservation/Find
+// @match        https://portalpacjenta.luxmed.pl/PatientPortal/NewPortal/Page/Reservation/Results
 // @grant        none
 // ==/UserScript==
 
@@ -30,7 +31,7 @@ function getDoctorService(doctor) {
 }
 
 function getSearchParamForDoctor(doctor) {
-    var doctorService = serviceLuxToDocPlanner.get(getDoctorService(doctor));
+    var doctorService = getDoctorService(doctor);
     var text = "query=" + doctorService + " " + getDoctorNameWithoutTitle(doctor) + "&hitsPerPage=4";
     return text.replace(/ /g, "%20");
 }
@@ -44,7 +45,7 @@ function createPointsElements(numberOfPoints) {
 }
 
 function addNoDataInfo(doctor) {
-    var doctorNameDiv = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(1)");
+    var doctorNameDiv = $(".doctor");
     var doctorName = getDoctorName(doctor);
     for (var i = 0; i < doctorNameDiv.length; i++) {
         if (doctorNameDiv[i].textContent.trim() === doctorName) {
@@ -58,7 +59,7 @@ function addNoDataInfo(doctor) {
 }
 
 function addPointsToPage(doctor, numberOfPoints, opinionCount, url) {
-    var doctorNameDiv = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(1)");
+    var doctorNameDiv = $(".doctor");
     var doctorName = getDoctorName(doctor);
     for (var i = 0; i < doctorNameDiv.length; i++) {
         if (doctorNameDiv[i].textContent.trim() === doctorName) {
@@ -145,11 +146,11 @@ serviceLuxToDocPlanner.set("Umówienie wizyty u stomatologa dziecięcego", "stom
 (function() {
     'use strict';
 
-    var doctorNames = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(1)");
-    var favour = $(".reserveTable > tbody > tr > td:nth-child(2) > div:nth-child(2)");
+    var doctorNames = $(".doctor");
+    var favour = $('.service .item');
     var doctors = new Set();
     for (var i = 0; i < doctorNames.length; i++) {
-        var doctor = createDoctor(doctorNames[i].textContent.trim(), favour[i].textContent.trim());
+        var doctor = createDoctor(doctorNames[i].textContent.trim(), favour.text().trim());
         doctors.add(doctor);
     }
 
